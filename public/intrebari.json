@@ -1,0 +1,37 @@
+[
+  {
+    "intrebare": "Ce companie a lansat primul smartphone cu ecran tactil?",
+    "variante": ["Apple", "Samsung", "Nokia", "BlackBerry"],
+    "corect": 0
+  },
+  {
+    "intrebare": "Care este cel mai bine vândut model de telefon din lume?",
+    "variante": ["iPhone", "Samsung Galaxy", "Nokia 1100", "Motorola RAZR V3"],
+    "corect": 2
+  },
+  {
+    "intrebare": "Ce înseamnă abrevierea LTE când vine vorba de tehnologie mobilă?",
+    "variante": ["Long-Term Evolution", "Lightweight Terminal Emulator", "Low-Temperature Electrodeposition", "Liquid Tension Experiment"],
+    "corect": 0
+  },
+  {
+    "intrebare": "Ce înseamnă abrevierea GB când vine vorba de spațiu de stocare?",
+    "variante": ["Gigabyte", "Great Britain", "Gummi Bears", "Global Biodiversity"],
+    "corect": 0
+  },
+  {
+    "intrebare": "Ce model de telefon a fost primul care a inclus un jack audio de 3.5mm?",
+    "variante": ["iPhone", "Samsung Galaxy", "Nokia", "Sony Ericsson"],
+    "corect": 3
+  },
+  {
+    "intrebare": "Ce marcă de telefoane folosește sistemul de operare iOS?",
+    "variante": ["Samsung", "Huawei", "Apple", "LG"],
+    "corect": 2
+  },
+  {
+    "intrebare": "Ce companie a lansat primul telefon cu ecran pliabil?",
+    "variante": ["Samsung", "Huawei", "Motorola", "Sony"],
+    "corect": 0
+  }
+]

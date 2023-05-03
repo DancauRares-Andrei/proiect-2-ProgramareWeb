@@ -12,26 +12,33 @@ app.use(express.static('public'))
 // corpul mesajului poate fi interpretat ca json; datele de la formular se găsesc în format json în req.body
 app.use(bodyParser.json());
 // utilizarea unui algoritm de deep parsing care suportă obiecte în obiecte
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 // la accesarea din browser adresei http://localhost:6789/ se va returna textul 'HelloWorld'
 // proprietățile obiectului Request - req - https://expressjs.com/en/api.html#req
 // proprietățile obiectului Response - res - https://expressjs.com/en/api.html#res
 app.get('/', (req, res) => res.send('Hello World'));
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
 app.get('/chestionar', (req, res) => {
-const listaIntrebari = [
-{
-intrebare: 'Întrebarea 1',
-variante: ['varianta 1', 'varianta 2', 'varianta 3', 'varianta 4'],
-corect: 0
-},
-//...
-];
-// în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
-res.render('chestionar', {intrebari: listaIntrebari});
+    const listaIntrebari = [{
+            intrebare: 'Întrebarea 1',
+            variante: ['varianta 1', 'varianta 2', 'varianta 3', 'varianta 4'],
+            corect: 0
+        },
+        {
+            intrebare: 'Întrebarea 1',
+            variante: ['varianta 1', 'varianta 2', 'varianta 3', 'varianta 4'],
+            corect: 0
+        }
+    ];
+    // în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
+    res.render('chestionar', {
+        intrebari: listaIntrebari
+    });
 });
 app.post('/rezultat-chestionar', (req, res) => {
-console.log(req.body);
-res.send("formular: " + JSON.stringify(req.body));
+    console.log(req.body);
+    res.send("formular: " + JSON.stringify(req.body));
 });
-app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`));
+app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`+port));

@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 const app = express();
 const port = 6789;
 const fs = require('fs');
-const listaIntrebari = JSON.parse(fs.readFileSync('./public/intrebari.json', 'utf-8'));
+//const listaIntrebari = JSON.parse(fs.readFileSync('./public/intrebari.json', 'utf-8'));
 // directorul 'views' va conține fișierele .ejs (html + js executat la server)
 app.set('view engine', 'ejs');
 // suport pentru layout-uri - implicit fișierul care reprezintă template-ul site-ului este views/layout.ejs
@@ -25,23 +25,31 @@ app.get('/favicon.ico', (req, res) => res.send('Hello World'));
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
 app.get('/chestionar', (req, res) => {
     // în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
-    res.render('chestionar', {
+    fs.readFile('./public/intrebari.json', (err, data) => {
+      if (err) throw err;
+      var listaIntrebari = JSON.parse(data);
+      res.render('chestionar', {
         intrebari: listaIntrebari
+    });
     });
 });
 
 app.post('/rezultat-chestionar', (req, res) => {
     let numarRaspunsuriCorecte = 0;
     console.log(req.body);
-    for (const indexIntrebare in req.body) {
-      const raspunsIntrebare = req.body[indexIntrebare];
-      const intrebare = listaIntrebari[indexIntrebare.substring(7)];
-      if (intrebare.variante[intrebare.corect] === raspunsIntrebare) {
-        numarRaspunsuriCorecte++;
+    fs.readFile('./public/intrebari.json', (err, data) => {
+      if (err) throw err;
+      var listaIntrebari = JSON.parse(data);
+      for (const indexIntrebare in req.body) {
+        const raspunsIntrebare = req.body[indexIntrebare];
+        const intrebare = listaIntrebari[indexIntrebare.substring(7)];
+        if (intrebare.variante[intrebare.corect] === raspunsIntrebare) {
+          numarRaspunsuriCorecte++;
+        }
       }
-    }
-    const rezultat = `Ai răspuns corect la ${numarRaspunsuriCorecte} din 7 întrebări.`;
-    res.render('rezultat-chestionar', { rezultatC: rezultat });
-  });
+      const rezultat = `Ai răspuns corect la ${numarRaspunsuriCorecte} din 7 întrebări.`;
+      res.render('rezultat-chestionar', { rezultatC: rezultat });
+    });
+    });
   
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`+port));

@@ -1,18 +1,13 @@
-<script>
-console.log(intrebari);
-</script>
 <h1>Chestionar</h1>
-<form>
+<form method="post" action="/rezultat-chestionar">
   <% intrebari.forEach(function(intrebare, index) { %>
-  <h2>Întrebarea <%= index + 1 %>: <%= intrebare.intrebare %></h2>
-  <% intrebare.variante.forEach(function(varianta, index) { %>
-    <label>
-      <input type="radio" name="raspuns<%= index %>" value="<%= varianta %>"/>
-      <%= varianta %>
-    </label><br/>
+    <h2>Întrebarea <%= index + 1 %>: <%= intrebare.intrebare %></h2>
+    <% intrebare.variante.forEach(function(varianta, variantaIndex) { %>
+      <label>
+        <input type="radio" name="raspuns<%= index %>" value="<%= varianta %>"/>
+        <%= varianta %>
+      </label><br/>
+    <% }) %>
   <% }) %>
-<% }) %>
-
   <button type="submit">Trimite răspunsurile</button>
 </form>
-

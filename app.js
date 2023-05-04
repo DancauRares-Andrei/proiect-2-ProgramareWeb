@@ -25,7 +25,7 @@ app.get('/favicon.ico', (req, res) => res.send('Hello World'));
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
 app.get('/chestionar', (req, res) => {
     // în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
-    fs.readFile('./public/intrebari.json', (err, data) => {
+    fs.readFile('./intrebari.json', (err, data) => {
       if (err) throw err;
       var listaIntrebari = JSON.parse(data);
       res.render('chestionar', {

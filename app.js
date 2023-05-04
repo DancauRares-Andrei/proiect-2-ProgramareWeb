@@ -29,7 +29,7 @@ app.get('/chestionar', (req, res) => {
       if (err) throw err;
       var listaIntrebari = JSON.parse(data);
       res.render('chestionar', {
-        intrebari: listaIntrebari
+        intrebari: listaIntrebari,layout:'layout'
     });
     });
 });
@@ -48,7 +48,7 @@ app.post('/rezultat-chestionar', (req, res) => {
         }
       }
       const rezultat = `Ai răspuns corect la ${numarRaspunsuriCorecte} din 7 întrebări.`;
-      res.render('rezultat-chestionar', { rezultatC: rezultat });
+      res.render('rezultat-chestionar', { rezultatC: rezultat ,layout:'layout'});
     });
     });
   

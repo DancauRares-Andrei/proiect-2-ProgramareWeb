@@ -1,2 +1,6 @@
-<h1>Bun venit pe pagina de start!</h1>
-<a href="/autentificare">Autentificare</a>
+<% if (utilizator) { %>
+    <p>Bine ai venit, <%= utilizator %>!</p>
+  <% } else { %>
+    <a href="/autentificare">Autentificare</a>
+  <% } %>
+  

@@ -49,6 +49,10 @@
   
   </style>
 <h1>Autentificare</h1>
+<% if (typeof mesajEroare !== 'undefined') { %>
+    <p style="color: red;"><%= mesajEroare %></p>
+  <% } %>
+  
     <form method="post" action="/verificare-autentificare">
       <label for="utilizator">Utilizator:</label>
       <input type="text" id="utilizator" name="utilizator"><br>

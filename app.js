@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({
 // la accesarea din browser adresei http://localhost:6789/ se va returna textul 'HelloWorld'
 // proprietățile obiectului Request - req - https://expressjs.com/en/api.html#req
 // proprietățile obiectului Response - res - https://expressjs.com/en/api.html#res
-app.get('/', (req, res) => res.send('Hello World'));
+app.get('/', (req, res) => res.render('index',{layout:'layout'}))
 app.get('/favicon.ico', (req, res) => res.send('Hello World'));
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
 app.get('/chestionar', (req, res) => {
@@ -37,7 +37,7 @@ app.get('/chestionar', (req, res) => {
 app.post('/rezultat-chestionar', (req, res) => {
     let numarRaspunsuriCorecte = 0;
     console.log(req.body);
-    fs.readFile('./public/intrebari.json', (err, data) => {
+    fs.readFile('./intrebari.json', (err, data) => {
       if (err) throw err;
       var listaIntrebari = JSON.parse(data);
       for (const indexIntrebare in req.body) {
@@ -51,5 +51,11 @@ app.post('/rezultat-chestionar', (req, res) => {
       res.render('rezultat-chestionar', { rezultatC: rezultat ,layout:'layout'});
     });
     });
-  
+    app.get('/autentificare', function(req, res) {
+      res.render('autentificare',{layout:'layout'});
+    });
+    app.post('/verificare-autentificare', function(req, res) {
+      console.log(req.body);
+      res.send('Se face autentificarea...');
+    });
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`+port));

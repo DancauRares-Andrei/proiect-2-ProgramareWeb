@@ -8,7 +8,18 @@
     font-size: 2.5rem;
     margin-top: 2rem;
   }
-  
+  #logoff{
+  display: flex;
+}
+#logoff>p{
+    margin:0.35rem;
+}
+#logoff input[type="submit"]{
+  margin-top:0;
+  margin-left: 2rem;
+  border: none;
+  padding: 4px;
+}
   h2 {
     font-size: 1.5rem;
     margin-top: 2rem;
@@ -48,6 +59,14 @@
   }
   
   </style>
+<% if (typeof utilizator !== 'undefined') { %>
+    <div id="logoff">
+    <p>Autentificat ca <%= utilizator %></p>
+    <form method="post" action="/logout">
+      <input type="submit" value="Deconectare">
+    </form>
+  </div>
+  <% } %>
 <h1>Autentificare</h1>
 <% if (typeof mesajEroare !== 'undefined') { %>
     <p style="color: red;"><%= mesajEroare %></p>

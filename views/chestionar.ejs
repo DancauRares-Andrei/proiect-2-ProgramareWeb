@@ -2,7 +2,18 @@
   body {
   font-family: Arial, sans-serif;
 }
-
+#logoff{
+  display: flex;
+}
+#logoff>p{
+    margin:0.35rem;
+}
+#logoff input[type="submit"]{
+  margin-top:0;
+  margin-left: 2rem;
+  border: none;
+  padding: 4px;
+}
 h1 {
   text-align: center;
   font-size: 2.5rem;
@@ -45,8 +56,28 @@ button[type="submit"]:hover {
   padding: 2rem;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
-
+input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-size: 1.2rem;
+    margin-left: 2rem;
+    cursor: pointer;
+  }
+  
+  input[type="submit"]:hover {
+    background-color: #3e8e41;
+  }
 </style>
+<% if (typeof utilizator !== 'undefined') { %>
+  <div id="logoff">
+  <p>Autentificat ca <%= utilizator %></p>
+  <form method="post" action="/logout">
+    <input type="submit" value="Deconectare">
+  </form>
+</div>
+<% } %>
 <h1>Chestionar</h1>
 <form method="post" action="/rezultat-chestionar">
   <% intrebari.forEach(function(intrebare, index) { %>

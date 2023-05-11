@@ -100,7 +100,7 @@ app.post('/verificare-autentificare', function(req, res) {
         }
     }
     if (utilizatorValid) {
-        res.cookie('utilizator', utilizator);
+        res.cookie('utilizator', utilizator, { maxAge: 7 * 24 * 60 * 60 * 1000 });
         res.clearCookie('mesajEroare');
         res.redirect('/');
         console.log(req.session.nume)

@@ -30,11 +30,22 @@ app.use(session({
 // proprietățile obiectului Response - res - https://expressjs.com/en/api.html#res
 app.get('/', (req, res) => {
     const utilizator = req.cookies.utilizator;
-    res.clearCookie('mesajEroare');
+    // Configurarea conexiunii la baza de date
+const connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'rares',
+  password : 'rares',
+  database : 'BazaProduse'
+});
+connection.query('SELECT * FROM produse', function(err, rows, fields) {
+  if (err) throw err;
+  res.clearCookie('mesajEroare');
     res.render('index', {
         utilizator: utilizator,
-        layout: 'layout'
-    })
+        layout: 'layout',
+        produse: rows
+    });
+});
 });
 app.get('/favicon.ico', (req, res) => res.send('Hello World'));
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
@@ -193,4 +204,13 @@ app.get('/inserare-bd', function(req, res) {
       });
     });
   });
+app.post('/adaugare_cos', function(req, res) {
+    const produsId = req.body.id; // id-ul produsului primit prin POST
+    req.session.cos = req.session.cos || []; // inițializăm vectorul de cos, dacă nu există deja
+    
+    req.session.cos.push(produsId); // adăugăm id-ul produsului în vectorul de cos
+    console.log(req.session.cos)
+    res.redirect('/'); // redirecționăm utilizatorul înapoi la pagina principală
+});
+  
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:` + port));

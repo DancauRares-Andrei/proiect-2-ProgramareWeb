@@ -5,6 +5,7 @@ const app = express();
 const port = 6789;
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
+const mysql = require('mysql');
 
 // directorul 'views' va conține fișierele .ejs (html + js executat la server)
 app.set('view engine', 'ejs');
@@ -116,5 +117,80 @@ app.post('/logout', function(req, res) {
         res.redirect('/');
     });
 });
-
+app.get('/creare-bd', function(req, res) {
+    
+// Configurarea conexiunii la baza de date
+const connection = mysql.createConnection({
+    host     : 'localhost',
+    user     : 'rares',
+    password : 'rares',
+    database : 'BazaProduse'
+  });
+  
+  // Conectarea la baza de date
+  connection.connect(function(err) {
+    if (err) {
+      console.error('Eroare la conectarea la baza de date: ' + err.stack);
+      return;
+    }
+    console.log('Conexiunea la baza de date a fost realizată cu succes.');
+  });
+  
+  // Crearea bazei de date si tabelului "produse"
+  connection.query('CREATE DATABASE IF NOT EXISTS BazaProduse', function(err, result) {
+    if (err) throw err;
+    console.log('Baza de date a fost creată cu succes.');
+  
+    const sql = "CREATE TABLE IF NOT EXISTS produse (id INT AUTO_INCREMENT PRIMARY KEY, nume VARCHAR(255), descriere VARCHAR(255), pret DECIMAL(10, 2))";
+    connection.query(sql, function (err, result) {
+      if (err) throw err;
+      console.log("Tabelul 'produse' a fost creat cu succes.");
+      // Închiderea conexiunii la baza de date
+      connection.end();
+      res.redirect('/');
+    });
+  });
+    
+});
+app.get('/inserare-bd', function(req, res) {
+    const connection = mysql.createConnection({
+      host: 'localhost',
+      user: 'rares',
+      password: 'rares',
+      database: 'BazaProduse'
+    });
+  
+    connection.connect(function(err) {
+      if (err) {
+        console.error('Eroare la conectare:', err);
+        throw err;
+      }
+      console.log('Conexiune la baza de date MySQL reusita!');
+  
+      const query = `INSERT INTO produse (nume, descriere, pret) VALUES 
+                      ('Samsung Galaxy A04s', '32GB, 3GB RAM, 4G, Black', 600.00),
+                      ('Motorola Moto g73', 'Dual SIM, 8GB RAM, 256GB, 5G, Midnight Blue', 1300.00),
+                      ('Samsung Galaxy A14', 'Dual SIM, 4GB RAM, 64GB, 4G, Black', 800.00),
+                      ('Samsung Galaxy A54', 'Dual SIM, 8GB RAM, 128GB, 5G, Black', 1880.00),
+                      ('Motorola Edge 20 Lite', '28GB, 8GB RAM, 5G, Electric Graphite', 1000.00),
+                      ('Apple iPhone 14 Pro', '128GB, 5G, Space Black', 5350.00),
+                      ('Apple iPhone 14 Pro Max', '128GB, 5G, Space Black', 6000.00),
+                      ('Samsung Galaxy S23 Ultra', 'Dual SIM, 512GB, 12GB RAM, 5G, Phantom Black', 6000.00),
+                      ('Samsung Galaxy A34', 'Dual SIM, 6GB RAM, 128GB, 5G, Black', 1510.00),
+                      ('Apple iPhone 11', '64GB, Black', 2270.00)`;
+  
+      connection.query(query, function (err, result) {
+        if (err) {
+          console.error('Eroare la inserare:', err);
+          throw err;
+        }
+        console.log('Inserare cu succes!');
+  
+        // Închide conexiunea la baza de date
+        connection.end();
+  
+        res.redirect('/');
+      });
+    });
+  });
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:` + port));

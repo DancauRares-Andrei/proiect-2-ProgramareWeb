@@ -31,21 +31,21 @@ app.use(session({
 app.get('/', (req, res) => {
     const utilizator = req.cookies.utilizator;
     // Configurarea conexiunii la baza de date
-const connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'rares',
-  password : 'rares',
-  database : 'BazaProduse'
-});
-connection.query('SELECT * FROM produse', function(err, rows, fields) {
-  if (err) throw err;
-  res.clearCookie('mesajEroare');
-    res.render('index', {
-        utilizator: utilizator,
-        layout: 'layout',
-        produse: rows
+    const connection = mysql.createConnection({
+        host: 'localhost',
+        user: 'rares',
+        password: 'rares',
+        database: 'BazaProduse'
     });
-});
+    connection.query('SELECT * FROM produse', function(err, rows, fields) {
+        if (err) throw err;
+        res.clearCookie('mesajEroare');
+        res.render('index', {
+            utilizator: utilizator,
+            layout: 'layout',
+            produse: rows
+        });
+    });
 });
 app.get('/favicon.ico', (req, res) => res.send('Hello World'));
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
@@ -112,7 +112,9 @@ app.post('/verificare-autentificare', function(req, res) {
         }
     }
     if (utilizatorValid) {
-        res.cookie('utilizator', utilizator, { maxAge: 7 * 24 * 60 * 60 * 1000 });
+        res.cookie('utilizator', utilizator, {
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
         res.clearCookie('mesajEroare');
         res.redirect('/');
         console.log(req.session.nume)
@@ -129,56 +131,56 @@ app.post('/logout', function(req, res) {
     });
 });
 app.get('/creare-bd', function(req, res) {
-    
-// Configurarea conexiunii la baza de date
-const connection = mysql.createConnection({
-    host     : 'localhost',
-    user     : 'rares',
-    password : 'rares',
-    database : 'BazaProduse'
-  });
-  
-  // Conectarea la baza de date
-  connection.connect(function(err) {
-    if (err) {
-      console.error('Eroare la conectarea la baza de date: ' + err.stack);
-      return;
-    }
-    console.log('Conexiunea la baza de date a fost realizată cu succes.');
-  });
-  
-  // Crearea bazei de date si tabelului "produse"
-  connection.query('CREATE DATABASE IF NOT EXISTS BazaProduse', function(err, result) {
-    if (err) throw err;
-    console.log('Baza de date a fost creată cu succes.');
-  
-    const sql = "CREATE TABLE IF NOT EXISTS produse (id INT AUTO_INCREMENT PRIMARY KEY, nume VARCHAR(255), descriere VARCHAR(255), pret DECIMAL(10, 2))";
-    connection.query(sql, function (err, result) {
-      if (err) throw err;
-      console.log("Tabelul 'produse' a fost creat cu succes.");
-      // Închiderea conexiunii la baza de date
-      connection.end();
-      res.redirect('/');
+
+    // Configurarea conexiunii la baza de date
+    const connection = mysql.createConnection({
+        host: 'localhost',
+        user: 'rares',
+        password: 'rares',
+        database: 'BazaProduse'
     });
-  });
-    
+
+    // Conectarea la baza de date
+    connection.connect(function(err) {
+        if (err) {
+            console.error('Eroare la conectarea la baza de date: ' + err.stack);
+            return;
+        }
+        console.log('Conexiunea la baza de date a fost realizată cu succes.');
+    });
+
+    // Crearea bazei de date si tabelului "produse"
+    connection.query('CREATE DATABASE IF NOT EXISTS BazaProduse', function(err, result) {
+        if (err) throw err;
+        console.log('Baza de date a fost creată cu succes.');
+
+        const sql = "CREATE TABLE IF NOT EXISTS produse (id INT AUTO_INCREMENT PRIMARY KEY, nume VARCHAR(255), descriere VARCHAR(255), pret DECIMAL(10, 2))";
+        connection.query(sql, function(err, result) {
+            if (err) throw err;
+            console.log("Tabelul 'produse' a fost creat cu succes.");
+            // Închiderea conexiunii la baza de date
+            connection.end();
+            res.redirect('/');
+        });
+    });
+
 });
 app.get('/inserare-bd', function(req, res) {
     const connection = mysql.createConnection({
-      host: 'localhost',
-      user: 'rares',
-      password: 'rares',
-      database: 'BazaProduse'
+        host: 'localhost',
+        user: 'rares',
+        password: 'rares',
+        database: 'BazaProduse'
     });
-  
+
     connection.connect(function(err) {
-      if (err) {
-        console.error('Eroare la conectare:', err);
-        throw err;
-      }
-      console.log('Conexiune la baza de date MySQL reusita!');
-  
-      const query = `INSERT INTO produse (nume, descriere, pret) VALUES 
+        if (err) {
+            console.error('Eroare la conectare:', err);
+            throw err;
+        }
+        console.log('Conexiune la baza de date MySQL reusita!');
+
+        const query = `INSERT INTO produse (nume, descriere, pret) VALUES 
                       ('Samsung Galaxy A04s', '32GB, 3GB RAM, 4G, Black', 600.00),
                       ('Motorola Moto g73', 'Dual SIM, 8GB RAM, 256GB, 5G, Midnight Blue', 1300.00),
                       ('Samsung Galaxy A14', 'Dual SIM, 4GB RAM, 64GB, 4G, Black', 800.00),
@@ -189,79 +191,94 @@ app.get('/inserare-bd', function(req, res) {
                       ('Samsung Galaxy S23 Ultra', 'Dual SIM, 512GB, 12GB RAM, 5G, Phantom Black', 6000.00),
                       ('Samsung Galaxy A34', 'Dual SIM, 6GB RAM, 128GB, 5G, Black', 1510.00),
                       ('Apple iPhone 11', '64GB, Black', 2270.00)`;
-  
-      connection.query(query, function (err, result) {
-        if (err) {
-          console.error('Eroare la inserare:', err);
-          throw err;
-        }
-        console.log('Inserare cu succes!');
-  
-        // Închide conexiunea la baza de date
-        connection.end();
-  
-        res.redirect('/');
-      });
+
+        connection.query(query, function(err, result) {
+            if (err) {
+                console.error('Eroare la inserare:', err);
+                throw err;
+            }
+            console.log('Inserare cu succes!');
+
+            // Închide conexiunea la baza de date
+            connection.end();
+
+            res.redirect('/');
+        });
     });
-  });
-  app.post('/adaugare_cos', function(req, res) {
+});
+app.post('/adaugare_cos', function(req, res) {
     const produsId = req.body.id; // id-ul produsului primit prin POST
     req.session.cos = req.session.cos || []; // inițializăm vectorul de cos, dacă nu există deja
-    
+
     // Verificăm dacă produsul se află deja în coș
     const produsExistent = req.session.cos.find(function(produs) {
-      return produs.id === produsId;
+        return produs.id === produsId;
     });
-    
+
     if (produsExistent) {
-      // Actualizăm cantitatea produsului existent
-      produsExistent.cantitate++;
+        // Actualizăm cantitatea produsului existent
+        produsExistent.cantitate++;
     } else {
-      // Adăugăm un nou produs în coș
-      req.session.cos.push({ id: produsId, cantitate: 1 });
+        // Adăugăm un nou produs în coș
+        req.session.cos.push({
+            id: produsId,
+            cantitate: 1
+        });
     }
-    
+
     console.log(req.session.cos);
     res.redirect('/'); // redirecționăm utilizatorul înapoi la pagina principală
-  });
-  
-  app.get('/vizualizare-cos', function(req, res) {
+});
+
+app.get('/vizualizare-cos', function(req, res) {
     const utilizator = req.cookies.utilizator;
     var cos = req.session.cos || [];
-  
+
     if (cos.length > 0) {
-      const connection = mysql.createConnection({
-        host: 'localhost',
-        user: 'rares',
-        password: 'rares',
-        database: 'BazaProduse'
-      });
-  
-      var placeholders = cos.map(function(produs) { return '?'; }).join(',');
-      var values = cos.map(function(produs) { return produs.id; });
-      var sql = 'SELECT * FROM produse WHERE id IN (' + placeholders + ')';
-  
-      connection.query(sql, values, function(err, result) {
-        if (err) throw err;
-  
-        // Combinați rezultatul interogării cu cantitățile din coș
-        var produseCos = result.map(function(produs) {
-          var produsCos = cos.find(function(item) {
-            return item.id == produs.id;
-          });
-  
-          produs.cantitate = produsCos ? produsCos.cantitate : 0;
-          return produs;
+        const connection = mysql.createConnection({
+            host: 'localhost',
+            user: 'rares',
+            password: 'rares',
+            database: 'BazaProduse'
         });
-  
-        res.render('vizualizare-cos', { utilizator: utilizator, layout: 'layout', produse: produseCos });
-        connection.end(); // Închideți conexiunea la baza de date după utilizare
-      });
+
+        var placeholders = cos.map(function(produs) {
+            return '?';
+        }).join(',');
+        var values = cos.map(function(produs) {
+            return produs.id;
+        });
+        var sql = 'SELECT * FROM produse WHERE id IN (' + placeholders + ')';
+
+        connection.query(sql, values, function(err, result) {
+            if (err) throw err;
+
+            // Combinați rezultatul interogării cu cantitățile din coș
+            var produseCos = result.map(function(produs) {
+                var produsCos = cos.find(function(item) {
+                    return item.id == produs.id;
+                });
+
+                produs.cantitate = produsCos ? produsCos.cantitate : 0;
+                return produs;
+            });
+
+            res.render('vizualizare-cos', {
+                utilizator: utilizator,
+                layout: 'layout',
+                produse: produseCos
+            });
+            connection.end(); // Închideți conexiunea la baza de date după utilizare
+        });
     } else {
-      res.render('vizualizare-cos', { utilizator: utilizator, layout: 'layout', produse: [] });
+        res.render('vizualizare-cos', {
+            utilizator: utilizator,
+            layout: 'layout',
+            produse: []
+        });
     }
-  });
-  
-  
+});
+
+
 
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:` + port));

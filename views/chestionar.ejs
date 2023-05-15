@@ -1,13 +1,14 @@
 <h1>Chestionar</h1>
 <form method="post" action="/rezultat-chestionar">
   <% intrebari.forEach(function(intrebare, index) { %>
-    <h2>Întrebarea <%= index + 1 %>: <%= intrebare.intrebare %></h2>
+    <h2>Întrebarea <%= index + 1 %>: <%= intrebare.intrebare %>
+    </h2>
     <% intrebare.variante.forEach(function(varianta, variantaIndex) { %>
       <label>
-        <input type="radio" name="raspuns<%= index %>" value="<%= varianta %>"/>
+        <input type="radio" name="raspuns<%= index %>" value="<%= varianta %>" />
         <%= varianta %>
-      </label><br/>
-    <% }) %>
-  <% }) %>
-  <button type="submit">Trimite răspunsurile</button>
+      </label><br />
+      <% }) %>
+        <% }) %>
+          <button type="submit">Trimite răspunsurile</button>
 </form>

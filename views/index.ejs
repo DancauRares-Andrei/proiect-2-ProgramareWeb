@@ -1,40 +1,49 @@
-
-<% if (typeof utilizator !== 'undefined') { %>
+<% if (typeof utilizator !=='undefined' ) { %>
   <p>Bine ai venit, <%= utilizator %>!</p>
   <% } else { %>
     <a href="/autentificare">Autentificare</a>
-  <% } %>  
-  <h1>Produse</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nume</th>
-        <th>Descriere</th>
-        <th>Preț</th>
-        <% if (utilizator) { %>
-          <th>Cumpără</th>
-          <% } %>
-      </tr>
-    </thead>
-    <tbody>
-      <% produse.forEach(function(produs) { %>
-        <tr>
-          <td><%= produs.id %></td>
-          <td><%= produs.nume %></td>
-          <td><%= produs.descriere %></td>
-          <td><%= produs.pret %> RON</td>
-          <% if (utilizator) { %>
-           <td><form action="/adaugare_cos" method="POST">
-            <input type="hidden" name="id" value="<%= produs.id %>">
-            <button>Adaugă în coș</button>
-          </form></td> 
-          <% } %>
-        </tr>
-      <% }); %>
-    </tbody>
-  </table>
-  <div class="button-container">
-    <button type="button" onclick="location.href='/creare-bd'">Creare BD</button>
-    <button type="button" onclick="location.href='/inserare-bd'">Încarcare BD</button>
-  </div>
+    <% } %>
+      <h1>Produse</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nume</th>
+            <th>Descriere</th>
+            <th>Preț</th>
+            <% if (utilizator) { %>
+              <th>Cumpără</th>
+              <% } %>
+          </tr>
+        </thead>
+        <tbody>
+          <% produse.forEach(function(produs) { %>
+            <tr>
+              <td>
+                <%= produs.id %>
+              </td>
+              <td>
+                <%= produs.nume %>
+              </td>
+              <td>
+                <%= produs.descriere %>
+              </td>
+              <td>
+                <%= produs.pret %> RON
+              </td>
+              <% if (utilizator) { %>
+                <td>
+                  <form action="/adaugare_cos" method="POST">
+                    <input type="hidden" name="id" value="<%= produs.id %>">
+                    <button>Adaugă în coș</button>
+                  </form>
+                </td>
+                <% } %>
+            </tr>
+            <% }); %>
+        </tbody>
+      </table>
+      <div class="button-container">
+        <button type="button" onclick="location.href='/creare-bd'">Creare BD</button>
+        <button type="button" onclick="location.href='/inserare-bd'">Încarcare BD</button>
+      </div>

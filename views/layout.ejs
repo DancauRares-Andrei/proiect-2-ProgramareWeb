@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Proiect 2 PW</title>
-    <style>
-      body {
+
+<head>
+  <title>Proiect 2 PW</title>
+  <style>
+    body {
       font-family: Arial, sans-serif;
     }
-    header{
+
+    header {
       display: flex;
     }
-    header ul{
-      display:flex;
+
+    header ul {
+      display: flex;
       padding-right: 10px;
     }
 
@@ -19,24 +22,24 @@
       font-size: 2.5rem;
       margin-top: 2rem;
     }
-    
+
     h2 {
       font-size: 1.5rem;
       margin-top: 2rem;
     }
-    
+
     label {
       display: block;
       margin-top: 1rem;
       margin-bottom: 1rem;
       font-size: 1.2rem;
     }
-    
+
     input[type="radio"] {
       margin-right: 0.5rem;
       vertical-align: middle;
     }
-    
+
     input[type="submit"] {
       background-color: #4CAF50;
       color: white;
@@ -46,162 +49,177 @@
       margin-left: 2rem;
       cursor: pointer;
     }
-    
+
     input[type="submit"]:hover {
       background-color: #3e8e41;
     }
-    
+
     .container {
       max-width: 800px;
       margin: 0 auto;
       padding: 2rem;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     }
+
     .menu {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f0f0f0;
-  padding: 10px;
-}
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f0f0f0;
+      padding: 10px;
+    }
 
-.menu-link {
-  margin: 0 10px;
-  text-decoration: none;
-  color: #333;
-  font-weight: bold;
-}
+    .menu-link {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
 
-.menu-link:hover {
-  color: #666;
-}
-#logout {
-  display: flex;
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  justify-content: center;
-  align-items: center;
-  background-color: #f0f0f0;
-  padding: 4.5px;
-}
-#logout p {
-  margin: 0 10px;
-  text-decoration: none;
-  color: #333;
-  font-weight: bold;
-}
-.button-container {
-  margin-top: 20px;
-  text-align: center;
-}
+    .menu-link:hover {
+      color: #666;
+    }
 
-.button-container button {
-  margin-right: 10px;
-  padding: 8px 16px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
+    #logout {
+      display: flex;
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      justify-content: center;
+      align-items: center;
+      background-color: #f0f0f0;
+      padding: 4.5px;
+    }
 
-.button-container button:hover {
-  background-color: #45a049;
-}
+    #logout p {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
 
-.button-container button:focus {
-  outline: none;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
+    .button-container {
+      margin-top: 20px;
+      text-align: center;
+    }
 
-table th, table td {
-  padding: 8px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
+    .button-container button {
+      margin-right: 10px;
+      padding: 8px 16px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
-table th {
-  background-color: #f2f2f2;
-  font-weight: bold;
-}
+    .button-container button:hover {
+      background-color: #45a049;
+    }
 
-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
+    .button-container button:focus {
+      outline: none;
+    }
 
-table tbody tr:hover {
-  background-color: #f5f5f5;
-}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
 
-table td button {
-  padding: 6px 10px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
+    table th,
+    table td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
 
-table td button:hover {
-  background-color: #45a049;
-}
+    table th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
 
-table td button:focus {
-  outline: none;
-}
-a[href="/autentificare"] {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  text-decoration: none;
-  color: #333;
-  font-weight: bold;
-}
-button[type="submit"] {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 1rem;
-  font-size: 1.2rem;
-  margin-top: 2rem;
-  cursor: pointer;
-}
+    table tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
 
-button[type="submit"]:hover {
-  background-color: #3e8e41;
-}
+    table tbody tr:hover {
+      background-color: #f5f5f5;
+    }
 
-    </style>
-  </head>
-  <body>
-    <header>
-      <nav class="menu">
-        <a href="/" class="menu-link">Acasă</a>
-        <a href="/chestionar" class="menu-link">Chestionar</a>
-        <% if (typeof utilizator !== 'undefined') { %>
-        <a href="/vizualizare-cos" class="menu-link">Coș</a>   
-      </nav>   
-      <div id="logout">
-        <p>Autentificat ca <%= utilizator %></p>
-        <form method="post" action="/logout">
-          <input type="submit" value="Deconectare">
-        </form>
-      </div>   
-          <% } else {%> 
-        </nav>
-        <% } %>
-    </header>
-    <main>
-      <%- body %> <!-- Aici se va insera conținutul view-ului specificat ca argument -->
-    </main>
-    <footer>
-      <p >&copy;2023. Dancău Rareș-Andrei</p>
-    </footer>
-  </body>
+    table td button {
+      padding: 6px 10px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    table td button:hover {
+      background-color: #45a049;
+    }
+
+    table td button:focus {
+      outline: none;
+    }
+
+    a[href="/autentificare"] {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+
+    button[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 1rem;
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #3e8e41;
+    }
+  #rezultat {
+    font-size: 18px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="menu">
+      <a href="/" class="menu-link">Acasă</a>
+      <a href="/chestionar" class="menu-link">Chestionar</a>
+      <% if (typeof utilizator !=='undefined' ) { %>
+        <a href="/vizualizare-cos" class="menu-link">Coș</a>
+    </nav>
+    <div id="logout">
+      <p>Autentificat ca <%= utilizator %>
+      </p>
+      <form method="post" action="/logout">
+        <input type="submit" value="Deconectare">
+      </form>
+    </div>
+    <% } else {%>
+      </nav>
+      <% } %>
+  </header>
+  <main>
+    <%- body %> <!-- Aici se va insera conținutul view-ului specificat ca argument -->
+  </main>
+  <footer>
+    <p>&copy;2023. Dancău Rareș-Andrei</p>
+  </footer>
+</body>
+
 </html>
-

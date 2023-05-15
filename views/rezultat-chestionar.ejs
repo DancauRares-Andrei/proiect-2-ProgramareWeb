@@ -79,13 +79,5 @@ footer p{
   text-align: left;
 }
 </style>
-<% if (typeof utilizator !== 'undefined') { %>
-  <div id="logoff">
-  <p>Autentificat ca <%= utilizator %></p>
-  <form method="post" action="/logout">
-    <input type="submit" value="Deconectare">
-  </form>
-</div>
-<% } %>
 <h1>Rezultat chestionar</h1>
 <p><%= rezultatC %></p>

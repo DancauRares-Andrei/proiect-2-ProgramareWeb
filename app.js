@@ -204,13 +204,64 @@ app.get('/inserare-bd', function(req, res) {
       });
     });
   });
-app.post('/adaugare_cos', function(req, res) {
+  app.post('/adaugare_cos', function(req, res) {
     const produsId = req.body.id; // id-ul produsului primit prin POST
     req.session.cos = req.session.cos || []; // inițializăm vectorul de cos, dacă nu există deja
     
-    req.session.cos.push(produsId); // adăugăm id-ul produsului în vectorul de cos
-    console.log(req.session.cos)
+    // Verificăm dacă produsul se află deja în coș
+    const produsExistent = req.session.cos.find(function(produs) {
+      return produs.id === produsId;
+    });
+    
+    if (produsExistent) {
+      // Actualizăm cantitatea produsului existent
+      produsExistent.cantitate++;
+    } else {
+      // Adăugăm un nou produs în coș
+      req.session.cos.push({ id: produsId, cantitate: 1 });
+    }
+    
+    console.log(req.session.cos);
     res.redirect('/'); // redirecționăm utilizatorul înapoi la pagina principală
-});
+  });
   
+  app.get('/vizualizare-cos', function(req, res) {
+    const utilizator = req.cookies.utilizator;
+    var cos = req.session.cos || [];
+  
+    if (cos.length > 0) {
+      const connection = mysql.createConnection({
+        host: 'localhost',
+        user: 'rares',
+        password: 'rares',
+        database: 'BazaProduse'
+      });
+  
+      var placeholders = cos.map(function(produs) { return '?'; }).join(',');
+      var values = cos.map(function(produs) { return produs.id; });
+      var sql = 'SELECT * FROM produse WHERE id IN (' + placeholders + ')';
+  
+      connection.query(sql, values, function(err, result) {
+        if (err) throw err;
+  
+        // Combinați rezultatul interogării cu cantitățile din coș
+        var produseCos = result.map(function(produs) {
+          var produsCos = cos.find(function(item) {
+            return item.id == produs.id;
+          });
+  
+          produs.cantitate = produsCos ? produsCos.cantitate : 0;
+          return produs;
+        });
+  
+        res.render('vizualizare-cos', { utilizator: utilizator, layout: 'layout', produse: produseCos });
+        connection.end(); // Închideți conexiunea la baza de date după utilizare
+      });
+    } else {
+      res.render('vizualizare-cos', { utilizator: utilizator, layout: 'layout', produse: [] });
+    }
+  });
+  
+  
+
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:` + port));

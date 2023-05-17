@@ -21,7 +21,30 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 const session = require('express-session');
-
+  // Mapare pentru a urmări numărul de încercări de acces la resurse inexistente
+  const accessAttempts = new Map();
+  const blockDuration = 10 * 1000; // Durata de blocare în milisecunde (aici setată la 10 de secunde)
+  // Middleware pentru urmărirea accesului la resurse inexistente
+  app.use((req, res, next) => {
+      // Obținem IP-ul utilizatorului
+      const ip = req.ip;
+    
+      // Verificăm dacă utilizatorul/IP-ul are un număr prea mare de încercări nereușite repetate
+      if (accessAttempts.has(ip) && accessAttempts.get(ip) >= 5) {
+        // Verificăm dacă blocarea a expirat
+        const blockTime = accessAttempts.get(ip + '-blockTime');
+        if (blockTime && Date.now() < blockTime + blockDuration) {
+          // Utilizatorul/IP-ul este încă blocat, returnăm un răspuns cu statusul 403
+          return res.status(403).send('Acces blocat temporar.');
+        } else {
+          // Blocarea a expirat, eliminăm utilizatorul/IP-ul din lista de blocări
+          accessAttempts.delete(ip);
+          accessAttempts.delete(ip + '-blockTime');
+        }
+      }
+    
+      next();
+    });
 app.use(session({
     secret: 'secret-key',
     resave: true,
@@ -323,5 +346,15 @@ else {
     res.status(400).send('Parametrii incorecți pentru adăugarea produsului!');
   }
   });
-
+// Ruta pentru resurse inexistente
+app.use((req, res) => {
+    // Incrementăm numărul de încercări nereușite repetate pentru utilizatorul/IP-ul curent
+    const ip = req.ip;
+    accessAttempts.set(ip, (accessAttempts.get(ip) || 0) + 1);
+  
+    // Setăm timpul de expirare pentru blocare
+    accessAttempts.set(ip + '-blockTime', Date.now());
+  
+    res.status(404).send('Pagina nu a fost găsită.');
+  });
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:` + port));

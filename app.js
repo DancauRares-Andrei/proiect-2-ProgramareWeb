@@ -59,10 +59,10 @@ app.get('/', (req, res) => {
         host: 'localhost',
         user: 'rares',
         password: 'rares',
-        database: 'BazaProduse'
+        database: 'cumparaturi'
     });
     connection.query('SELECT * FROM produse', function(err, rows, fields) {
-        if (err) throw err;
+        if (err) {}
         res.clearCookie('mesajEroare');
         res.render('index', {
             utilizator: utilizator,
@@ -244,7 +244,7 @@ app.get('/creare-bd', function(req, res) {
         host: 'localhost',
         user: 'rares',
         password: 'rares',
-        database: 'BazaProduse'
+        database: 'cumparaturi'
     });
 
     // Conectarea la baza de date
@@ -256,11 +256,6 @@ app.get('/creare-bd', function(req, res) {
         console.log('Conexiunea la baza de date a fost realizată cu succes.');
     });
 
-    // Crearea bazei de date si tabelului "produse"
-    connection.query('CREATE DATABASE IF NOT EXISTS BazaProduse', function(err, result) {
-        if (err) throw err;
-        console.log('Baza de date a fost creată cu succes.');
-
         const sql = "CREATE TABLE IF NOT EXISTS produse (id INT AUTO_INCREMENT PRIMARY KEY, nume VARCHAR(255), descriere VARCHAR(255), pret DECIMAL(10, 2))";
         connection.query(sql, function(err, result) {
             if (err) throw err;
@@ -269,7 +264,6 @@ app.get('/creare-bd', function(req, res) {
             connection.end();
             res.redirect('/');
         });
-    });
 
 });
 app.get('/inserare-bd', function(req, res) {
@@ -277,7 +271,7 @@ app.get('/inserare-bd', function(req, res) {
         host: 'localhost',
         user: 'rares',
         password: 'rares',
-        database: 'BazaProduse'
+        database: 'cumparaturi'
     });
 
     connection.connect(function(err) {
@@ -346,7 +340,7 @@ app.get('/vizualizare-cos', function(req, res) {
             host: 'localhost',
             user: 'rares',
             password: 'rares',
-            database: 'BazaProduse'
+            database: 'cumparaturi'
         });
 
         var placeholders = cos.map(function(produs) {
@@ -409,7 +403,7 @@ app.post('/adauga-produs', (req, res) => {
         host: 'localhost',
         user: 'rares',
         password: 'rares',
-        database: 'BazaProduse'
+        database: 'cumparaturi'
     });
     if (nume && descriere && pret) {
         // Construim interogarea SQL pentru inserarea în baza de date, folosind parametrii

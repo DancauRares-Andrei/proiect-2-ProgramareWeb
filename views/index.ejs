@@ -3,6 +3,7 @@
   <% } else { %>
     <a href="/autentificare">Autentificare</a>
     <% } %>
+    <% if (typeof produse !=='undefined' ) { %>
       <h1>Produse</h1>
       <table>
         <thead>
@@ -43,6 +44,7 @@
             <% }); %>
         </tbody>
       </table>
+      <% } %>
       <div class="button-container">
         <button type="button" onclick="location.href='/creare-bd'">Creare BD</button>
         <button type="button" onclick="location.href='/inserare-bd'">Încarcare BD</button>

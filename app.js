@@ -66,6 +66,7 @@ app.get('/', (req, res) => {
         res.clearCookie('mesajEroare');
         res.render('index', {
             utilizator: utilizator,
+            tip:req.cookies.tip,
             layout: 'layout',
             produse: rows
         });
@@ -82,6 +83,7 @@ app.get('/chestionar', (req, res) => {
         res.render('chestionar', {
             utilizator: utilizator,
             intrebari: listaIntrebari,
+            tip:req.cookies.tip,
             layout: 'layout'
         });
     });
@@ -105,6 +107,7 @@ app.post('/rezultat-chestionar', (req, res) => {
         res.render('rezultat-chestionar', {
             utilizator: utilizator,
             rezultatC: rezultat,
+            tip:req.cookies.tip,
             layout: 'layout'
         });
     });
@@ -154,6 +157,7 @@ app.get('/autentificare', function(req, res) {
     res.render('autentificare', {
         utilizator: utilizator,
         mesajEroare: req.cookies.mesajEroare,
+        tip:req.cookies.tip,
         layout: 'layout'
     });
 });
@@ -368,6 +372,7 @@ app.get('/vizualizare-cos', function(req, res) {
 
             res.render('vizualizare-cos', {
                 utilizator: utilizator,
+                tip:req.cookies.tip,
                 layout: 'layout',
                 produse: produseCos
             });
@@ -376,6 +381,7 @@ app.get('/vizualizare-cos', function(req, res) {
     } else {
         res.render('vizualizare-cos', {
             utilizator: utilizator,
+            tip:req.cookies.tip,
             layout: 'layout',
             produse: []
         });
@@ -386,7 +392,7 @@ app.get('/vizualizare-cos', function(req, res) {
 app.get('/admin', (req, res) => {
     // Verificăm dacă există cookie-ul "admin" și are valoarea "true"
     if (req.cookies.tip === 'ADMIN') {
-        res.render('admin', {layout: 'layout'});
+        res.render('admin', {tip:req.cookies.tip,layout: 'layout'});
     } else {
       res.status(403).send('Acces interzis!');
     }
@@ -394,7 +400,9 @@ app.get('/admin', (req, res) => {
 // Ruta pentru inserarea unui produs în baza de date
 app.post('/adauga-produs', (req, res) => {
     // Extragem valorile din corpul cererii (request body)
-    const { nume, descriere, pret } = req.body;
+    const nume = req.body.nume;
+  const descriere = req.body.descriere;
+  const pret = req.body.pret;
   
     // Aici poți adăuga codul pentru inserarea produsului în baza de date
     const connection = mysql.createConnection({
@@ -409,14 +417,16 @@ app.post('/adauga-produs', (req, res) => {
     connection.query(query,[nume, descriere, pret],function(err, result) {
         if (err) {
             console.error('Eroare la inserare:', err);
-            throw err;
+            res.status(500).send('A apărut o eroare în timpul adăugării produsului.');
         }
+        else{
         console.log('Inserare cu succes!');
 
         // Închide conexiunea la baza de date
         connection.end();
 
         res.redirect('/');
+        }
     });
 }
 else {

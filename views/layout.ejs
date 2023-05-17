@@ -202,6 +202,9 @@
       <a href="/chestionar" class="menu-link">Chestionar</a>
       <% if (typeof utilizator !=='undefined' ) { %>
         <a href="/vizualizare-cos" class="menu-link">Coș</a>
+        <% if (typeof tip !== 'undefined' && tip === 'ADMIN') { %>
+          <a href="/admin" class="menu-link">Adăugare produs</a>
+          <% } %>
     </nav>
     <div id="logout">
       <p>Autentificat ca <%= utilizator %>

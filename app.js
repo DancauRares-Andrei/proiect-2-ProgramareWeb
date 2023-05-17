@@ -21,6 +21,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 const session = require('express-session');
+
 app.use(session({
     secret: 'secret-key',
     resave: true,
@@ -108,6 +109,8 @@ app.post('/verificare-autentificare', function(req, res) {
             req.session.nume = u.nume;
             req.session.prenume = u.prenume;
             req.session.varsta = u.varsta;
+            res.cookie('tip',u.tip);
+            console.log(u.tip);
             break;
         }
     }
@@ -279,6 +282,46 @@ app.get('/vizualizare-cos', function(req, res) {
     }
 });
 
+// Ruta pentru pagina /admin
+app.get('/admin', (req, res) => {
+    // Verificăm dacă există cookie-ul "admin" și are valoarea "true"
+    if (req.cookies.tip === 'ADMIN') {
+        res.render('admin', {layout: 'layout'});
+    } else {
+      res.status(403).send('Acces interzis!');
+    }
+  });
+// Ruta pentru inserarea unui produs în baza de date
+app.post('/adauga-produs', (req, res) => {
+    // Extragem valorile din corpul cererii (request body)
+    const { nume, descriere, pret } = req.body;
+  
+    // Aici poți adăuga codul pentru inserarea produsului în baza de date
+    const connection = mysql.createConnection({
+        host: 'localhost',
+        user: 'rares',
+        password: 'rares',
+        database: 'BazaProduse'
+    });
+    if (nume && descriere && pret) {
+        // Construim interogarea SQL pentru inserarea în baza de date, folosind parametrii
+        const query = `INSERT INTO produse (nume, descriere, pret) VALUES (?, ?, ?)`;
+    connection.query(query,[nume, descriere, pret],function(err, result) {
+        if (err) {
+            console.error('Eroare la inserare:', err);
+            throw err;
+        }
+        console.log('Inserare cu succes!');
 
+        // Închide conexiunea la baza de date
+        connection.end();
+
+        res.redirect('/');
+    });
+}
+else {
+    res.status(400).send('Parametrii incorecți pentru adăugarea produsului!');
+  }
+  });
 
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:` + port));

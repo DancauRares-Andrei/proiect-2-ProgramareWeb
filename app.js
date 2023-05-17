@@ -117,6 +117,29 @@ app.get('/autentificare', function(req, res) {
         layout: 'layout'
     });
 });
+// Mapare pentru a urmări numărul de încercări nereușite repetate și timpul de expirare
+const failedLoginAttempts = new Map();
+const maxFailedAttempts = 3; // Numărul maxim de încercări nereușite permise
+app.post('/verificare-autentificare', (req, res, next) => {
+    const ip = req.ip;
+  
+    // Verificăm dacă IP-ul are un număr prea mare de încercări nereușite repetate
+    if (failedLoginAttempts.has(ip) && failedLoginAttempts.get(ip) >= maxFailedAttempts) {
+      // Verificăm dacă blocarea a expirat
+      const blockTime = failedLoginAttempts.get(ip + '-blockTime');
+      if (blockTime && Date.now() < blockTime + blockDuration) {
+        // Utilizatorul/IP-ul este încă blocat, returnăm un mesaj de eroare
+        return res.status(403).send('Acces blocat temporar. Încercați din nou mai târziu.');
+      } else {
+        // Blocarea a expirat, eliminăm utilizatorul/IP-ul din lista de blocări
+        failedLoginAttempts.delete(ip);
+        failedLoginAttempts.delete(ip + '-blockTime');
+      }
+    }
+  
+    next();
+  });
+
 app.post('/verificare-autentificare', function(req, res) {
     const utilizator = req.body.utilizator;
     const parola = req.body.parola;
@@ -146,6 +169,9 @@ app.post('/verificare-autentificare', function(req, res) {
         console.log(req.session.nume)
     } else {
         res.cookie('mesajEroare', 'Nume de utilizator sau parolă incorecte. Vă rugăm să încercați din nou!');
+        const ip = req.ip;
+        failedLoginAttempts.set(ip, (failedLoginAttempts.get(ip) || 0) + 1);
+        failedLoginAttempts.set(ip + '-blockTime', Date.now());
         res.redirect('/autentificare');
     }
 });

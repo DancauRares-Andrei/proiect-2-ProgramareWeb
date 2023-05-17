@@ -109,6 +109,46 @@ app.post('/rezultat-chestionar', (req, res) => {
         });
     });
 });
+
+// Mapare pentru a urmări numărul de încercări nereușite în intervalele scurt și lung
+const failedLoginAttemptsShortInterval = new Map();
+const failedLoginAttemptsLongInterval = new Map();
+const maxFailedAttemptsShortInterval = 3; // Numărul maxim de încercări nereușite în intervalul scurt
+const maxFailedAttemptsLongInterval = 5; // Numărul maxim de încercări nereușite în intervalul lung
+
+// Middleware pentru verificarea accesului și blocarea temporară la autentificare și pagina "/autentificare"
+const blockAccessMiddleware = (req, res, next) => {
+    const ip = req.ip;
+  
+    // Verificăm numărul de încercări nereușite în intervalul scurt și lung
+    if (
+      (failedLoginAttemptsShortInterval.has(ip) && failedLoginAttemptsShortInterval.get(ip) >= maxFailedAttemptsShortInterval) ||
+      (failedLoginAttemptsLongInterval.has(ip) && failedLoginAttemptsLongInterval.get(ip) >= maxFailedAttemptsLongInterval)
+    ) {
+      // Verificăm dacă utilizatorul/IP-ul este încă blocat într-unul dintre intervale
+      const blockTimeShortInterval = failedLoginAttemptsShortInterval.get(ip + '-startTime');
+      const blockTimeLongInterval = failedLoginAttemptsLongInterval.get(ip + '-startTime');
+  
+      if (
+        (blockTimeShortInterval && Date.now() < blockTimeShortInterval + blockDuration) ||
+        (blockTimeLongInterval && Date.now() < blockTimeLongInterval + blockDuration)
+      ) {
+        // Utilizatorul/IP-ul este încă blocat, returnăm un mesaj de eroare
+        return res.status(403).send('Acces blocat temporar. Încercați din nou mai târziu.');
+      } else {
+        // Blocarea a expirat, resetăm numărul de încercări nereușite și timpul de blocare
+        failedLoginAttemptsShortInterval.delete(ip);
+        failedLoginAttemptsShortInterval.delete(ip + '-startTime');
+        failedLoginAttemptsLongInterval.delete(ip);
+        failedLoginAttemptsLongInterval.delete(ip + '-startTime');
+      }
+    }
+  
+    next();
+  };
+// Middleware-ul este aplicat atât pentru ruta "/verificare-autentificare" cât și pentru "/autentificare"
+app.post('/verificare-autentificare', blockAccessMiddleware);
+app.get('/autentificare', blockAccessMiddleware);
 app.get('/autentificare', function(req, res) {
     const utilizator = req.cookies.utilizator;
     res.render('autentificare', {
@@ -117,29 +157,6 @@ app.get('/autentificare', function(req, res) {
         layout: 'layout'
     });
 });
-// Mapare pentru a urmări numărul de încercări nereușite repetate și timpul de expirare
-const failedLoginAttempts = new Map();
-const maxFailedAttempts = 3; // Numărul maxim de încercări nereușite permise
-app.post('/verificare-autentificare', (req, res, next) => {
-    const ip = req.ip;
-  
-    // Verificăm dacă IP-ul are un număr prea mare de încercări nereușite repetate
-    if (failedLoginAttempts.has(ip) && failedLoginAttempts.get(ip) >= maxFailedAttempts) {
-      // Verificăm dacă blocarea a expirat
-      const blockTime = failedLoginAttempts.get(ip + '-blockTime');
-      if (blockTime && Date.now() < blockTime + blockDuration) {
-        // Utilizatorul/IP-ul este încă blocat, returnăm un mesaj de eroare
-        return res.status(403).send('Acces blocat temporar. Încercați din nou mai târziu.');
-      } else {
-        // Blocarea a expirat, eliminăm utilizatorul/IP-ul din lista de blocări
-        failedLoginAttempts.delete(ip);
-        failedLoginAttempts.delete(ip + '-blockTime');
-      }
-    }
-  
-    next();
-  });
-
 app.post('/verificare-autentificare', function(req, res) {
     const utilizator = req.body.utilizator;
     const parola = req.body.parola;
@@ -169,9 +186,43 @@ app.post('/verificare-autentificare', function(req, res) {
         console.log(req.session.nume)
     } else {
         res.cookie('mesajEroare', 'Nume de utilizator sau parolă incorecte. Vă rugăm să încercați din nou!');
-        const ip = req.ip;
-        failedLoginAttempts.set(ip, (failedLoginAttempts.get(ip) || 0) + 1);
-        failedLoginAttempts.set(ip + '-blockTime', Date.now());
+         // Dacă autentificarea eșuează, înregistrăm încercarea nereușită pentru IP-ul utilizatorului
+  const ip = req.ip;
+
+  // Verificăm în ce interval de timp se încadrează încercarea nereușită și actualizăm mapările corespunzătoare
+  const currentTime = Date.now();
+  const shortIntervalStartTime = currentTime - (10 * 60 * 1000); // Interval scurt de 10 minute
+  const longIntervalStartTime = currentTime - (60 * 60 * 1000); // Interval lung de 1 oră
+
+  if (!failedLoginAttemptsShortInterval.has(ip)) {
+    // Înregistrăm timpul de început al intervalului scurt pentru IP-ul utilizatorului
+    failedLoginAttemptsShortInterval.set(ip, 0);
+    failedLoginAttemptsShortInterval.set(ip + '-startTime', currentTime);
+  }
+
+  if (!failedLoginAttemptsLongInterval.has(ip)) {
+    // Înregistrăm timpul de început al intervalului lung pentru IP-ul utilizatorului
+    failedLoginAttemptsLongInterval.set(ip, 0);
+    failedLoginAttemptsLongInterval.set(ip + '-startTime', currentTime);
+  }
+
+  if (failedLoginAttemptsShortInterval.get(ip + '-startTime') < shortIntervalStartTime) {
+    // Resetăm numărul de încercări nereușite în intervalul scurt
+    failedLoginAttemptsShortInterval.set(ip, 1);
+    failedLoginAttemptsShortInterval.set(ip + '-startTime', currentTime);
+  } else {
+    // Incrementăm numărul de încercări nereușite în intervalul scurt
+    failedLoginAttemptsShortInterval.set(ip, failedLoginAttemptsShortInterval.get(ip) + 1);
+  }
+
+  if (failedLoginAttemptsLongInterval.get(ip + '-startTime') < longIntervalStartTime) {
+    // Resetăm numărul de încercări nereușite în intervalul lung
+    failedLoginAttemptsLongInterval.set(ip, 1);
+    failedLoginAttemptsLongInterval.set(ip + '-startTime', currentTime);
+  } else {
+    // Incrementăm numărul de încercări nereușite în intervalul lung
+    failedLoginAttemptsLongInterval.set(ip, failedLoginAttemptsLongInterval.get(ip) + 1);
+  }
         res.redirect('/autentificare');
     }
 });

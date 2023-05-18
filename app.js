@@ -21,30 +21,30 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 const session = require('express-session');
-  // Mapare pentru a urmări numărul de încercări de acces la resurse inexistente
-  const accessAttempts = new Map();
-  const blockDuration = 10 * 1000; // Durata de blocare în milisecunde (aici setată la 10 de secunde)
-  // Middleware pentru urmărirea accesului la resurse inexistente
-  app.use((req, res, next) => {
-      // Obținem IP-ul utilizatorului
-      const ip = req.ip;
-    
-      // Verificăm dacă utilizatorul/IP-ul are un număr prea mare de încercări nereușite repetate
-      if (accessAttempts.has(ip) && accessAttempts.get(ip) >= 5) {
+// Mapare pentru a urmări numărul de încercări de acces la resurse inexistente
+const accessAttempts = new Map();
+const blockDuration = 10 * 1000; // Durata de blocare în milisecunde (aici setată la 10 de secunde)
+// Middleware pentru urmărirea accesului la resurse inexistente
+app.use((req, res, next) => {
+    // Obținem IP-ul utilizatorului
+    const ip = req.ip;
+
+    // Verificăm dacă utilizatorul/IP-ul are un număr prea mare de încercări nereușite repetate
+    if (accessAttempts.has(ip) && accessAttempts.get(ip) >= 5) {
         // Verificăm dacă blocarea a expirat
         const blockTime = accessAttempts.get(ip + '-blockTime');
         if (blockTime && Date.now() < blockTime + blockDuration) {
-          // Utilizatorul/IP-ul este încă blocat, returnăm un răspuns cu statusul 403
-          return res.status(403).send('Acces blocat temporar.');
+            // Utilizatorul/IP-ul este încă blocat, returnăm un răspuns cu statusul 403
+            return res.status(403).send('Acces blocat temporar.');
         } else {
-          // Blocarea a expirat, eliminăm utilizatorul/IP-ul din lista de blocări
-          accessAttempts.delete(ip);
-          accessAttempts.delete(ip + '-blockTime');
+            // Blocarea a expirat, eliminăm utilizatorul/IP-ul din lista de blocări
+            accessAttempts.delete(ip);
+            accessAttempts.delete(ip + '-blockTime');
         }
-      }
-    
-      next();
-    });
+    }
+
+    next();
+});
 app.use(session({
     secret: 'secret-key',
     resave: true,
@@ -66,7 +66,7 @@ app.get('/', (req, res) => {
         res.clearCookie('mesajEroare');
         res.render('index', {
             utilizator: utilizator,
-            tip:req.cookies.tip,
+            tip: req.session.tip,
             layout: 'layout',
             produse: rows
         });
@@ -83,7 +83,7 @@ app.get('/chestionar', (req, res) => {
         res.render('chestionar', {
             utilizator: utilizator,
             intrebari: listaIntrebari,
-            tip:req.cookies.tip,
+            tip: req.session.tip,
             layout: 'layout'
         });
     });
@@ -107,7 +107,7 @@ app.post('/rezultat-chestionar', (req, res) => {
         res.render('rezultat-chestionar', {
             utilizator: utilizator,
             rezultatC: rezultat,
-            tip:req.cookies.tip,
+            tip: req.session.tip,
             layout: 'layout'
         });
     });
@@ -122,33 +122,33 @@ const maxFailedAttemptsLongInterval = 5; // Numărul maxim de încercări nereu�
 // Middleware pentru verificarea accesului și blocarea temporară la autentificare și pagina "/autentificare"
 const blockAccessMiddleware = (req, res, next) => {
     const ip = req.ip;
-  
+
     // Verificăm numărul de încercări nereușite în intervalul scurt și lung
     if (
-      (failedLoginAttemptsShortInterval.has(ip) && failedLoginAttemptsShortInterval.get(ip) >= maxFailedAttemptsShortInterval) ||
-      (failedLoginAttemptsLongInterval.has(ip) && failedLoginAttemptsLongInterval.get(ip) >= maxFailedAttemptsLongInterval)
+        (failedLoginAttemptsShortInterval.has(ip) && failedLoginAttemptsShortInterval.get(ip) >= maxFailedAttemptsShortInterval) ||
+        (failedLoginAttemptsLongInterval.has(ip) && failedLoginAttemptsLongInterval.get(ip) >= maxFailedAttemptsLongInterval)
     ) {
-      // Verificăm dacă utilizatorul/IP-ul este încă blocat într-unul dintre intervale
-      const blockTimeShortInterval = failedLoginAttemptsShortInterval.get(ip + '-startTime');
-      const blockTimeLongInterval = failedLoginAttemptsLongInterval.get(ip + '-startTime');
-  
-      if (
-        (blockTimeShortInterval && Date.now() < blockTimeShortInterval + blockDuration) ||
-        (blockTimeLongInterval && Date.now() < blockTimeLongInterval + blockDuration)
-      ) {
-        // Utilizatorul/IP-ul este încă blocat, returnăm un mesaj de eroare
-        return res.status(403).send('Acces blocat temporar. Încercați din nou mai târziu.');
-      } else {
-        // Blocarea a expirat, resetăm numărul de încercări nereușite și timpul de blocare
-        failedLoginAttemptsShortInterval.delete(ip);
-        failedLoginAttemptsShortInterval.delete(ip + '-startTime');
-        failedLoginAttemptsLongInterval.delete(ip);
-        failedLoginAttemptsLongInterval.delete(ip + '-startTime');
-      }
+        // Verificăm dacă utilizatorul/IP-ul este încă blocat într-unul dintre intervale
+        const blockTimeShortInterval = failedLoginAttemptsShortInterval.get(ip + '-startTime');
+        const blockTimeLongInterval = failedLoginAttemptsLongInterval.get(ip + '-startTime');
+
+        if (
+            (blockTimeShortInterval && Date.now() < blockTimeShortInterval + blockDuration) ||
+            (blockTimeLongInterval && Date.now() < blockTimeLongInterval + blockDuration)
+        ) {
+            // Utilizatorul/IP-ul este încă blocat, returnăm un mesaj de eroare
+            return res.status(403).send('Acces blocat temporar. Încercați din nou mai târziu.');
+        } else {
+            // Blocarea a expirat, resetăm numărul de încercări nereușite și timpul de blocare
+            failedLoginAttemptsShortInterval.delete(ip);
+            failedLoginAttemptsShortInterval.delete(ip + '-startTime');
+            failedLoginAttemptsLongInterval.delete(ip);
+            failedLoginAttemptsLongInterval.delete(ip + '-startTime');
+        }
     }
-  
+
     next();
-  };
+};
 // Middleware-ul este aplicat atât pentru ruta "/verificare-autentificare" cât și pentru "/autentificare"
 app.post('/verificare-autentificare', blockAccessMiddleware);
 app.get('/autentificare', blockAccessMiddleware);
@@ -157,7 +157,7 @@ app.get('/autentificare', function(req, res) {
     res.render('autentificare', {
         utilizator: utilizator,
         mesajEroare: req.cookies.mesajEroare,
-        tip:req.cookies.tip,
+        tip: req.session.tip,
         layout: 'layout'
     });
 });
@@ -176,7 +176,8 @@ app.post('/verificare-autentificare', function(req, res) {
             req.session.nume = u.nume;
             req.session.prenume = u.prenume;
             req.session.varsta = u.varsta;
-            res.cookie('tip',u.tip);
+            //res.cookie('tip', u.tip);
+            req.session.tip=u.tip;
             console.log(u.tip);
             break;
         }
@@ -190,43 +191,43 @@ app.post('/verificare-autentificare', function(req, res) {
         console.log(req.session.nume)
     } else {
         res.cookie('mesajEroare', 'Nume de utilizator sau parolă incorecte. Vă rugăm să încercați din nou!');
-         // Dacă autentificarea eșuează, înregistrăm încercarea nereușită pentru IP-ul utilizatorului
-  const ip = req.ip;
+        // Dacă autentificarea eșuează, înregistrăm încercarea nereușită pentru IP-ul utilizatorului
+        const ip = req.ip;
 
-  // Verificăm în ce interval de timp se încadrează încercarea nereușită și actualizăm mapările corespunzătoare
-  const currentTime = Date.now();
-  const shortIntervalStartTime = currentTime - (10 * 60 * 1000); // Interval scurt de 10 minute
-  const longIntervalStartTime = currentTime - (60 * 60 * 1000); // Interval lung de 1 oră
+        // Verificăm în ce interval de timp se încadrează încercarea nereușită și actualizăm mapările corespunzătoare
+        const currentTime = Date.now();
+        const shortIntervalStartTime = currentTime - (10 * 60 * 1000); // Interval scurt de 10 minute
+        const longIntervalStartTime = currentTime - (60 * 60 * 1000); // Interval lung de 1 oră
 
-  if (!failedLoginAttemptsShortInterval.has(ip)) {
-    // Înregistrăm timpul de început al intervalului scurt pentru IP-ul utilizatorului
-    failedLoginAttemptsShortInterval.set(ip, 0);
-    failedLoginAttemptsShortInterval.set(ip + '-startTime', currentTime);
-  }
+        if (!failedLoginAttemptsShortInterval.has(ip)) {
+            // Înregistrăm timpul de început al intervalului scurt pentru IP-ul utilizatorului
+            failedLoginAttemptsShortInterval.set(ip, 0);
+            failedLoginAttemptsShortInterval.set(ip + '-startTime', currentTime);
+        }
 
-  if (!failedLoginAttemptsLongInterval.has(ip)) {
-    // Înregistrăm timpul de început al intervalului lung pentru IP-ul utilizatorului
-    failedLoginAttemptsLongInterval.set(ip, 0);
-    failedLoginAttemptsLongInterval.set(ip + '-startTime', currentTime);
-  }
+        if (!failedLoginAttemptsLongInterval.has(ip)) {
+            // Înregistrăm timpul de început al intervalului lung pentru IP-ul utilizatorului
+            failedLoginAttemptsLongInterval.set(ip, 0);
+            failedLoginAttemptsLongInterval.set(ip + '-startTime', currentTime);
+        }
 
-  if (failedLoginAttemptsShortInterval.get(ip + '-startTime') < shortIntervalStartTime) {
-    // Resetăm numărul de încercări nereușite în intervalul scurt
-    failedLoginAttemptsShortInterval.set(ip, 1);
-    failedLoginAttemptsShortInterval.set(ip + '-startTime', currentTime);
-  } else {
-    // Incrementăm numărul de încercări nereușite în intervalul scurt
-    failedLoginAttemptsShortInterval.set(ip, failedLoginAttemptsShortInterval.get(ip) + 1);
-  }
+        if (failedLoginAttemptsShortInterval.get(ip + '-startTime') < shortIntervalStartTime) {
+            // Resetăm numărul de încercări nereușite în intervalul scurt
+            failedLoginAttemptsShortInterval.set(ip, 1);
+            failedLoginAttemptsShortInterval.set(ip + '-startTime', currentTime);
+        } else {
+            // Incrementăm numărul de încercări nereușite în intervalul scurt
+            failedLoginAttemptsShortInterval.set(ip, failedLoginAttemptsShortInterval.get(ip) + 1);
+        }
 
-  if (failedLoginAttemptsLongInterval.get(ip + '-startTime') < longIntervalStartTime) {
-    // Resetăm numărul de încercări nereușite în intervalul lung
-    failedLoginAttemptsLongInterval.set(ip, 1);
-    failedLoginAttemptsLongInterval.set(ip + '-startTime', currentTime);
-  } else {
-    // Incrementăm numărul de încercări nereușite în intervalul lung
-    failedLoginAttemptsLongInterval.set(ip, failedLoginAttemptsLongInterval.get(ip) + 1);
-  }
+        if (failedLoginAttemptsLongInterval.get(ip + '-startTime') < longIntervalStartTime) {
+            // Resetăm numărul de încercări nereușite în intervalul lung
+            failedLoginAttemptsLongInterval.set(ip, 1);
+            failedLoginAttemptsLongInterval.set(ip + '-startTime', currentTime);
+        } else {
+            // Incrementăm numărul de încercări nereușite în intervalul lung
+            failedLoginAttemptsLongInterval.set(ip, failedLoginAttemptsLongInterval.get(ip) + 1);
+        }
         res.redirect('/autentificare');
     }
 });
@@ -234,6 +235,7 @@ app.post('/logout', function(req, res) {
     req.session.destroy(function(err) {
         res.clearCookie('utilizator');
         res.clearCookie('mesajEroare');
+        res.clearCookie('tip');
         res.redirect('/');
     });
 });
@@ -256,14 +258,14 @@ app.get('/creare-bd', function(req, res) {
         console.log('Conexiunea la baza de date a fost realizată cu succes.');
     });
 
-        const sql = "CREATE TABLE IF NOT EXISTS produse (id INT AUTO_INCREMENT PRIMARY KEY, nume VARCHAR(255), descriere VARCHAR(255), pret DECIMAL(10, 2))";
-        connection.query(sql, function(err, result) {
-            if (err) throw err;
-            console.log("Tabelul 'produse' a fost creat cu succes.");
-            // Închiderea conexiunii la baza de date
-            connection.end();
-            res.redirect('/');
-        });
+    const sql = "CREATE TABLE IF NOT EXISTS produse (id INT AUTO_INCREMENT PRIMARY KEY, nume VARCHAR(255), descriere VARCHAR(255), pret DECIMAL(10, 2))";
+    connection.query(sql, function(err, result) {
+        if (err) throw err;
+        console.log("Tabelul 'produse' a fost creat cu succes.");
+        // Închiderea conexiunii la baza de date
+        connection.end();
+        res.redirect('/');
+    });
 
 });
 app.get('/inserare-bd', function(req, res) {
@@ -366,7 +368,7 @@ app.get('/vizualizare-cos', function(req, res) {
 
             res.render('vizualizare-cos', {
                 utilizator: utilizator,
-                tip:req.cookies.tip,
+                tip: req.session.tip,
                 layout: 'layout',
                 produse: produseCos
             });
@@ -375,7 +377,7 @@ app.get('/vizualizare-cos', function(req, res) {
     } else {
         res.render('vizualizare-cos', {
             utilizator: utilizator,
-            tip:req.cookies.tip,
+            tip: req.session.tip,
             layout: 'layout',
             produse: []
         });
@@ -385,19 +387,22 @@ app.get('/vizualizare-cos', function(req, res) {
 // Ruta pentru pagina /admin
 app.get('/admin', (req, res) => {
     // Verificăm dacă există cookie-ul "admin" și are valoarea "true"
-    if (req.cookies.tip === 'ADMIN') {
-        res.render('admin', {tip:req.cookies.tip,layout: 'layout'});
+    if (req.session.tip=== 'ADMIN') {
+        res.render('admin', {
+            tip: req.session.tip,
+            layout: 'layout'
+        });
     } else {
-      res.status(403).send('Acces interzis!');
+        res.status(403).send('Acces interzis!');
     }
-  });
+});
 // Ruta pentru inserarea unui produs în baza de date
 app.post('/adauga-produs', (req, res) => {
     // Extragem valorile din corpul cererii (request body)
     const nume = req.body.nume;
-  const descriere = req.body.descriere;
-  const pret = req.body.pret;
-  
+    const descriere = req.body.descriere;
+    const pret = req.body.pret;
+
     // Aici poți adăuga codul pentru inserarea produsului în baza de date
     const connection = mysql.createConnection({
         host: 'localhost',
@@ -408,34 +413,32 @@ app.post('/adauga-produs', (req, res) => {
     if (nume && descriere && pret) {
         // Construim interogarea SQL pentru inserarea în baza de date, folosind parametrii
         const query = `INSERT INTO produse (nume, descriere, pret) VALUES (?, ?, ?)`;
-    connection.query(query,[nume, descriere, pret],function(err, result) {
-        if (err) {
-            console.error('Eroare la inserare:', err);
-            res.status(500).send('A apărut o eroare în timpul adăugării produsului.');
-        }
-        else{
-        console.log('Inserare cu succes!');
+        connection.query(query, [nume, descriere, pret], function(err, result) {
+            if (err) {
+                console.error('Eroare la inserare:', err);
+                res.status(500).send('A apărut o eroare în timpul adăugării produsului.');
+            } else {
+                console.log('Inserare cu succes!');
 
-        // Închide conexiunea la baza de date
-        connection.end();
+                // Închide conexiunea la baza de date
+                connection.end();
 
-        res.redirect('/');
-        }
-    });
-}
-else {
-    res.status(400).send('Parametrii incorecți pentru adăugarea produsului!');
-  }
-  });
+                res.redirect('/');
+            }
+        });
+    } else {
+        res.status(400).send('Parametrii incorecți pentru adăugarea produsului!');
+    }
+});
 // Ruta pentru resurse inexistente
 app.use((req, res) => {
     // Incrementăm numărul de încercări nereușite repetate pentru utilizatorul/IP-ul curent
     const ip = req.ip;
     accessAttempts.set(ip, (accessAttempts.get(ip) || 0) + 1);
-  
+
     // Setăm timpul de expirare pentru blocare
     accessAttempts.set(ip + '-blockTime', Date.now());
-  
+
     res.status(404).send('Pagina nu a fost găsită.');
-  });
+});
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:` + port));

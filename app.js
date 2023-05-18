@@ -431,7 +431,7 @@ app.post('/adauga-produs', (req, res) => {
     }
 });
 // Ruta pentru resurse inexistente
-app.use((req, res) => {
+app.all('*',(req, res) => {
     // Incrementăm numărul de încercări nereușite repetate pentru utilizatorul/IP-ul curent
     const ip = req.ip;
     accessAttempts.set(ip, (accessAttempts.get(ip) || 0) + 1);

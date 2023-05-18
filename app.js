@@ -390,6 +390,7 @@ app.get('/admin', (req, res) => {
     if (req.session.tip=== 'ADMIN') {
         res.render('admin', {
             tip: req.session.tip,
+            utilizator:req.session.utilizator,
             layout: 'layout'
         });
     } else {

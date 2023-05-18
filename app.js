@@ -53,7 +53,7 @@ app.use(session({
 // proprietățile obiectului Request - req - https://expressjs.com/en/api.html#req
 // proprietățile obiectului Response - res - https://expressjs.com/en/api.html#res
 app.get('/', (req, res) => {
-    const utilizator = req.cookies.utilizator;
+    const utilizator = req.session.utilizator ;
     // Configurarea conexiunii la baza de date
     const connection = mysql.createConnection({
         host: 'localhost',
@@ -75,7 +75,7 @@ app.get('/', (req, res) => {
 app.get('/favicon.ico', (req, res) => res.send('Hello World'));
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
 app.get('/chestionar', (req, res) => {
-    const utilizator = req.cookies.utilizator;
+    const utilizator = req.session.utilizator;
     // în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
     fs.readFile('./intrebari.json', (err, data) => {
         if (err) throw err;
@@ -90,7 +90,7 @@ app.get('/chestionar', (req, res) => {
 });
 
 app.post('/rezultat-chestionar', (req, res) => {
-    const utilizator = req.cookies.utilizator;
+    const utilizator = req.session.utilizator ;
     let numarRaspunsuriCorecte = 0;
     console.log(req.body);
     fs.readFile('./intrebari.json', (err, data) => {
@@ -153,7 +153,7 @@ const blockAccessMiddleware = (req, res, next) => {
 app.post('/verificare-autentificare', blockAccessMiddleware);
 app.get('/autentificare', blockAccessMiddleware);
 app.get('/autentificare', function(req, res) {
-    const utilizator = req.cookies.utilizator;
+    const utilizator = req.session.utilizator ;
     res.render('autentificare', {
         utilizator: utilizator,
         mesajEroare: req.cookies.mesajEroare,
@@ -188,7 +188,7 @@ app.post('/verificare-autentificare', function(req, res) {
         });
         res.clearCookie('mesajEroare');
         res.redirect('/');
-        console.log(req.session.nume)
+        //console.log(req.session.nume);
     } else {
         res.cookie('mesajEroare', 'Nume de utilizator sau parolă incorecte. Vă rugăm să încercați din nou!');
         // Dacă autentificarea eșuează, înregistrăm încercarea nereușită pentru IP-ul utilizatorului
@@ -235,7 +235,7 @@ app.post('/logout', function(req, res) {
     req.session.destroy(function(err) {
         res.clearCookie('utilizator');
         res.clearCookie('mesajEroare');
-        res.clearCookie('tip');
+        //res.clearCookie('tip');
         res.redirect('/');
     });
 });
@@ -334,7 +334,7 @@ app.post('/adaugare_cos', function(req, res) {
 });
 
 app.get('/vizualizare-cos', function(req, res) {
-    const utilizator = req.cookies.utilizator;
+    const utilizator = req.session.utilizator ;
     var cos = req.session.cos || [];
 
     if (cos.length > 0) {
